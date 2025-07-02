@@ -2,6 +2,8 @@
 extends Node
 class_name HttpServer
 
+const MCPRoutes = preload("res://addons/godot_agent_mcp/mcp_routes.gd")
+
 var tcp_server: TCPServer
 var port: int = 8080
 var running: bool = false
@@ -109,14 +111,21 @@ func _handle_request(method: String, path: String, headers: Dictionary, body: St
 func _handle_mcp_request(body: String) -> String:
 	print("MCP: Received request - ", body)
 	
-	# Basic MCP JSON-RPC response
-	var mcp_response: Dictionary = {
-		"jsonrpc": "2.0",
-		"id": null,
-		"result": {
-			"status": "ok",
-			"message": "Request processed"
-		}
-	}
+	# Parse JSON request
+	var json := JSON.new()
+	var parse_result := json.parse(body)
+	if parse_result != OK:
+		return JSON.stringify({
+			"jsonrpc": "2.0",
+			"id": null,
+			"error": {"code": -32700, "message": "Parse error"}
+		})
 	
-	return JSON.stringify(mcp_response)
+	var request: Dictionary = json.data
+	var method: String = request.get("method", "")
+	var params: Dictionary = request.get("params", {})
+	var id: Variant = request.get("id", null)
+	
+	# Delegate to MCP routes handler
+	var response: Dictionary = MCPRoutes.handle_request(method, params, id)
+	return JSON.stringify(response)
