@@ -128,4 +128,6 @@ func _handle_mcp_request(body: String) -> String:
 	
 	# Delegate to MCP routes handler
 	var response: Dictionary = MCPRoutes.handle_request(method, params, id)
-	return JSON.stringify(response)
+	var jsonified: String = JSON.stringify(response)
+	print("MCP: Sending response - ", jsonified)
+	return jsonified

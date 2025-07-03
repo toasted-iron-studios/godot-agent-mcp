@@ -6,6 +6,25 @@ var _schema: Dictionary
 func _init(schema: Dictionary):
 	_schema = schema
 
+func get_mcp_type() -> String:
+	return "object"
+
+func to_mcp_property() -> Dictionary:
+	var property = super()
+	
+	# Add schema-specific properties
+	property["properties"] = {}
+	property["required"] = []
+	
+	for field_name in _schema:
+		var field_validator: Zodot = _schema[field_name]
+		property["properties"][field_name] = field_validator.to_mcp_property()
+		
+		if not field_validator._nullable:
+			property["required"].append(field_name)
+	
+	return property
+
 func parse(value: Variant, field: Variant = "") -> ZodotResult:
 	if _coerce and typeof(value) == TYPE_STRING:
 		value = str_to_var(value)

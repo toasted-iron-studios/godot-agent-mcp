@@ -4,19 +4,23 @@ class_name MCPRoutes
 
 const CreateNodeTool = preload("res://addons/godot_agent_mcp/tools/create_node_tool.gd")
 
-enum ToolName {
-	CREATE_NODE
-}
-
-const TOOL_NAME_MAP: Dictionary = {
-	ToolName.CREATE_NODE: "create_node"
-}
+const TOOLS: Array = [
+	CreateNodeTool
+]
 
 static func handle_request(method: String, params: Dictionary, id: Variant) -> Dictionary:
 	var result: Dictionary = {}
-	
-	# Handle different MCP methods
 	match method:
+		"initialize":
+			result = {
+				"capabilities": {
+					"tools": _list_tools()
+				},
+				"serverInfo": {
+					"name": "godot-agent-mcp",
+					"version": "1.0.0"
+				}
+			}
 		"tools/list":
 			result = _list_tools()
 		"tools/call":
@@ -37,15 +41,36 @@ static func handle_request(method: String, params: Dictionary, id: Variant) -> D
 	}
 
 static func _list_tools() -> Dictionary:
+	var tools_array = []
+	for tool_class in TOOLS:
+		var schema = format_tool_schema(tool_class)
+		tools_array.append(schema)
 	return {
-		"tools": [
-			CreateNodeTool.get_schema()
-		]
+		"tools": tools_array
 	}
 
+## Utility function to format a tool's schema for MCP
+static func format_tool_schema(tool_class) -> Dictionary:
+	var input_schema = tool_class.get_input_schema()
+	return {
+		"name": tool_class.get_name(),
+		"description": tool_class.get_description(),
+		"inputSchema": input_schema.to_mcp_property()
+	}
+	
+static func _get_tool_by_name(tool_name: String):
+	for tool_class in TOOLS:
+		if tool_class.get_name() == tool_name:
+			return tool_class
+	return null
+
 static func _call_tool(tool_name: String, arguments: Dictionary) -> Dictionary:
-	match tool_name:
-		TOOL_NAME_MAP[ToolName.CREATE_NODE]:
-			return CreateNodeTool.run(arguments)
-		_:
-			return {"error": "Tool not found: " + tool_name}
+	var tool_class = _get_tool_by_name(tool_name)
+	if not tool_class:
+		return {"error": "Tool not found: " + tool_name}
+	
+	var validation_result: ZodotResult = tool_class.get_input_schema().parse(arguments)
+	if not validation_result.ok():
+		return {"error": "Invalid parameters: " + validation_result.error}
+	
+	return tool_class.run(arguments)

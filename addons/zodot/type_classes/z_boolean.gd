@@ -14,6 +14,9 @@ func _init(kind: Kind) -> void:
 func _valid_type(value: Variant) -> bool:
 	return typeof(value) == TYPE_BOOL
 
+func get_mcp_type() -> String:
+	return "boolean"
+
 func parse(value: Variant, field: Variant = "") -> ZodotResult:
 	if _coerce and typeof(value) == TYPE_STRING:
 		value = str_to_var(value)

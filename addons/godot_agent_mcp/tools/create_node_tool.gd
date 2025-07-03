@@ -1,59 +1,28 @@
 @tool
-extends BaseTool
+extends MCPTool
 class_name CreateNodeTool
 
-const TOOL_NAME: String = "create_node"
-const TOOL_DESCRIPTION: String = "Creates a new node in the scene under a specified parent"
+static func get_name() -> String:
+	return "create_node"
+
+static func get_description() -> String:
+	return "Creates a new node in the scene under a specified parent"
 
 static func get_input_schema() -> z_schema:
 	return Z.schema({
-		"parent_path": Z.string(),
-		"node_type": Z.string(),
-		"node_name": Z.string()
+		"parent_path": Z.string().describe("Path to the parent node"),
+		"node_type": Z.string().describe("Type of node to create"),
+		"node_name": Z.string().describe("Name for the new node")
 	})
 
-static func get_schema() -> Dictionary:
-	return {
-		"name": TOOL_NAME,
-		"description": TOOL_DESCRIPTION,
-		"inputSchema": {
-			"type": "object",
-			"properties": {
-				"parent_path": {
-					"type": "string",
-					"description": "Path to the parent node"
-				},
-				"node_type": {
-					"type": "string", 
-					"description": "Type of node to create"
-				},
-				"node_name": {
-					"type": "string",
-					"description": "Name for the new node"
-				}
-			},
-			"required": ["parent_path", "node_type", "node_name"]
-		}
-	}
 
 static func run(params: Dictionary) -> Dictionary:
-	# Input validation with Zodot
-	var validation_result: ZodotResult = get_input_schema().parse(params)
-	if not validation_result.ok():
-		return error_response("Invalid parameters: " + validation_result.error)
-	
 	# Extract parameters
 	var parent_path: String = params.get("parent_path", "")
 	var node_type: String = params.get("node_type", "")
 	var node_name: String = params.get("node_name", "")
-	
-	# Get editor plugin and interfaces
-	var plugin = Engine.get_meta("GodotAgentMCPPlugin")
-	if not plugin:
-		return error_response("GodotAgentMCPPlugin not found in Engine metadata")
-	
-	var editor_interface = plugin.get_editor_interface()
-	var scene_root: Node = editor_interface.get_edited_scene_root()
+
+	var scene_root: Node = get_scene_root()
 	if not scene_root:
 		return error_response("No scene is currently open")
 	
