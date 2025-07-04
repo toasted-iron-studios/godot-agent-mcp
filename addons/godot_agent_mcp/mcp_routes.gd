@@ -1,20 +1,24 @@
 @tool
 extends RefCounted
-class_name MCPRoutes
+class_name MCPRouter
 
-const CreateNodeTool = preload("res://addons/godot_agent_mcp/tools/create_node_tool.gd")
+const MCPError = preload("res://addons/godot_agent_mcp/mcp_error.gd")
 
-const TOOLS: Array = [
-	CreateNodeTool
-]
+var _tools: Array[MCPTool] = []
 
-static func handle_request(method: String, params: Dictionary, id: Variant) -> Dictionary:
+func _init(tools: Array[MCPTool]):
+	_tools = tools
+
+func handle_request(method: String, params: Dictionary, id: Variant) -> Dictionary:
 	var result: Dictionary = {}
 	match method:
 		"initialize":
 			result = {
+				"protocolVersion": "2025-06-18",
 				"capabilities": {
-					"tools": _list_tools()
+					"tools": {
+						"listChanged": true
+					}
 				},
 				"serverInfo": {
 					"name": "godot-agent-mcp",
@@ -26,12 +30,26 @@ static func handle_request(method: String, params: Dictionary, id: Variant) -> D
 		"tools/call":
 			var tool_name: String = params.get("name", "")
 			var tool_arguments: Dictionary = params.get("arguments", {})
-			result = _call_tool(tool_name, tool_arguments)
+			var tool_result = _call_tool(tool_name, tool_arguments)
+			if tool_result.has("error"):
+				if tool_result["error"] is MCPError.MCPProtocolError:
+					var error_obj = tool_result["error"] as MCPError.MCPProtocolError
+					return {
+						"jsonrpc": "2.0",
+						"id": id,
+						"error": error_obj.to_json_rpc_error()
+					}
+				elif tool_result["error"] is MCPError.MCPToolError:
+					var error_obj = tool_result["error"] as MCPError.MCPToolError
+					result = error_obj.to_mcp_result()
+			else:
+				result = tool_result
 		_:
+			var error = MCPError.MCPMethodNotFoundError.new(method)
 			return {
 				"jsonrpc": "2.0",
 				"id": id,
-				"error": {"code": -32601, "message": "Method not found"}
+				"error": error.to_json_rpc_error()
 			}
 	
 	return {
@@ -40,37 +58,39 @@ static func handle_request(method: String, params: Dictionary, id: Variant) -> D
 		"result": result
 	}
 
-static func _list_tools() -> Dictionary:
+func _list_tools() -> Dictionary:
 	var tools_array = []
-	for tool_class in TOOLS:
-		var schema = format_tool_schema(tool_class)
+	for tool in _tools:
+		var schema = format_tool_schema(tool)
 		tools_array.append(schema)
 	return {
 		"tools": tools_array
 	}
 
 ## Utility function to format a tool's schema for MCP
-static func format_tool_schema(tool_class) -> Dictionary:
-	var input_schema = tool_class.get_input_schema()
+func format_tool_schema(tool: MCPTool) -> Dictionary:
+	var input_schema = tool.get_input_schema()
 	return {
-		"name": tool_class.get_name(),
-		"description": tool_class.get_description(),
+		"name": tool.get_name(),
+		"description": tool.get_description(),
 		"inputSchema": input_schema.to_mcp_property()
 	}
 	
-static func _get_tool_by_name(tool_name: String):
-	for tool_class in TOOLS:
-		if tool_class.get_name() == tool_name:
-			return tool_class
+func _get_tool_by_name(tool_name: String) -> MCPTool:
+	for tool in _tools:
+		if tool.get_name() == tool_name:
+			return tool
 	return null
 
-static func _call_tool(tool_name: String, arguments: Dictionary) -> Dictionary:
-	var tool_class = _get_tool_by_name(tool_name)
-	if not tool_class:
-		return {"error": "Tool not found: " + tool_name}
+func _call_tool(tool_name: String, arguments: Dictionary) -> Dictionary:
+	var tool = _get_tool_by_name(tool_name)
+	if not tool:
+		var error = MCPError.MCPToolNotFoundError.new(tool_name)
+		return {"error": error}
 	
-	var validation_result: ZodotResult = tool_class.get_input_schema().parse(arguments)
+	var validation_result: ZodotResult = tool.get_input_schema().parse(arguments)
 	if not validation_result.ok():
-		return {"error": "Invalid parameters: " + validation_result.error}
+		var error = MCPError.MCPInvalidParametersError.new(validation_result.error)
+		return {"error": error}
 	
-	return tool_class.run(arguments)
+	return tool.run(arguments)

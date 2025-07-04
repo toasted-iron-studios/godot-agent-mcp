@@ -1,26 +1,29 @@
 extends RefCounted
 class_name TestMCPToolIntegration
 
+const MCPRouter = preload("res://addons/godot_agent_mcp/mcp_routes.gd")
+
 # Mock tool class for testing
 class MockTool extends MCPTool:
-	static func get_name() -> String:
+	func get_name() -> String:
 		return "mock_tool"
 	
-	static func get_description() -> String:
+	func get_description() -> String:
 		return "A mock tool for testing"
 	
-	static func get_input_schema() -> z_schema:
+	func get_input_schema() -> z_schema:
 		return Z.schema({
 			"text": Z.string().describe("Input text"),
 			"count": Z.integer().describe("Number count"),
 			"enabled": Z.boolean().describe("Enable flag")
 		})
 	
-	static func run(_params: Dictionary) -> Dictionary:
-		return ok_response({"message": "Mock tool executed"})
+	func run(_params: Dictionary) -> Dictionary:
+		return ok({"message": "Mock tool executed"})
 
 func test_mcp_tool_get_schema_structure() -> void:
-	var schema: Dictionary = MCPRoutes.format_tool_schema(MockTool)
+	var router: MCPRouter = MCPRouter.new([MockTool.new()])
+	var schema: Dictionary = router.format_tool_schema(MockTool.new())
 	
 	assert(schema.has("name"), "Schema should have name field")
 	assert(schema.has("description"), "Schema should have description field")
@@ -30,7 +33,8 @@ func test_mcp_tool_get_schema_structure() -> void:
 	assert(schema["description"] == "A mock tool for testing", "Schema description should match tool description")
 
 func test_mcp_tool_input_schema_conversion() -> void:
-	var schema: Dictionary = MCPRoutes.format_tool_schema(MockTool)
+	var router: MCPRouter = MCPRouter.new([MockTool.new()])
+	var schema: Dictionary = router.format_tool_schema(MockTool.new())
 	var input_schema: Dictionary = schema["inputSchema"]
 	
 	assert(input_schema["type"] == "object", "Input schema should be object type")
@@ -38,7 +42,8 @@ func test_mcp_tool_input_schema_conversion() -> void:
 	assert(input_schema.has("required"), "Input schema should have required array")
 
 func test_mcp_tool_properties_conversion() -> void:
-	var schema: Dictionary = MCPRoutes.format_tool_schema(MockTool)
+	var router: MCPRouter = MCPRouter.new([MockTool.new()])
+	var schema: Dictionary = router.format_tool_schema(MockTool.new())
 	var properties: Dictionary = schema["inputSchema"]["properties"]
 	
 	assert(properties.has("text"), "Properties should have text field")
@@ -54,7 +59,8 @@ func test_mcp_tool_properties_conversion() -> void:
 	assert(properties["enabled"]["description"] == "Enable flag", "Enabled field should have description")
 
 func test_mcp_tool_required_fields() -> void:
-	var schema: Dictionary = MCPRoutes.format_tool_schema(MockTool)
+	var router: MCPRouter = MCPRouter.new([MockTool.new()])
+	var schema: Dictionary = router.format_tool_schema(MockTool.new())
 	var required: Array = schema["inputSchema"]["required"]
 	
 	assert(required is Array, "Required should be an Array")
@@ -65,13 +71,13 @@ func test_mcp_tool_required_fields() -> void:
 
 # Test tool with nested schemas
 class NestedMockTool extends MCPTool:
-	static func get_name() -> String:
+	func get_name() -> String:
 		return "nested_tool"
 	
-	static func get_description() -> String:
+	func get_description() -> String:
 		return "A tool with nested schemas"
 	
-	static func get_input_schema() -> z_schema:
+	func get_input_schema() -> z_schema:
 		return Z.schema({
 			"user": Z.schema({
 				"name": Z.string().describe("User name"),
@@ -83,11 +89,12 @@ class NestedMockTool extends MCPTool:
 			"metadata": Z.dictionary().nullable().describe("Optional metadata")
 		})
 	
-	static func run(_params: Dictionary) -> Dictionary:
-		return ok_response({"message": "Nested tool executed"})
+	func run(_params: Dictionary) -> Dictionary:
+		return ok({"message": "Nested tool executed"})
 
 func test_nested_tool_schema_conversion() -> void:
-	var schema: Dictionary = MCPRoutes.format_tool_schema(NestedMockTool)
+	var router: MCPRouter = MCPRouter.new([NestedMockTool.new()])
+	var schema: Dictionary = router.format_tool_schema(NestedMockTool.new())
 	var input_schema: Dictionary = schema["inputSchema"]
 	var properties: Dictionary = input_schema["properties"]
 	
@@ -109,7 +116,8 @@ func test_nested_tool_schema_conversion() -> void:
 	assert(preferences_property["description"] == "User preferences", "Preferences should have description")
 
 func test_nested_tool_required_fields() -> void:
-	var schema: Dictionary = MCPRoutes.format_tool_schema(NestedMockTool)
+	var router: MCPRouter = MCPRouter.new([NestedMockTool.new()])
+	var schema: Dictionary = router.format_tool_schema(NestedMockTool.new())
 	var input_schema: Dictionary = schema["inputSchema"]
 	var required: Array = input_schema["required"]
 	
@@ -124,13 +132,13 @@ func test_nested_tool_required_fields() -> void:
 
 # Test tool with array items
 class ArrayMockTool extends MCPTool:
-	static func get_name() -> String:
+	func get_name() -> String:
 		return "array_tool"
 	
-	static func get_description() -> String:
+	func get_description() -> String:
 		return "A tool with array schemas"
 	
-	static func get_input_schema() -> z_schema:
+	func get_input_schema() -> z_schema:
 		return Z.schema({
 			"tags": Z.array().items(Z.string().describe("Tag value")).describe("List of tags"),
 			"items": Z.array().items(Z.schema({
@@ -139,11 +147,12 @@ class ArrayMockTool extends MCPTool:
 			})).describe("List of items")
 		})
 	
-	static func run(_params: Dictionary) -> Dictionary:
-		return ok_response({"message": "Array tool executed"})
+	func run(_params: Dictionary) -> Dictionary:
+		return ok({"message": "Array tool executed"})
 
 func test_array_tool_schema_conversion() -> void:
-	var schema: Dictionary = MCPRoutes.format_tool_schema(ArrayMockTool)
+	var router: MCPRouter = MCPRouter.new([ArrayMockTool.new()])
+	var schema: Dictionary = router.format_tool_schema(ArrayMockTool.new())
 	var properties: Dictionary = schema["inputSchema"]["properties"]
 	
 	# Test string array
@@ -161,7 +170,8 @@ func test_array_tool_schema_conversion() -> void:
 
 func test_create_node_tool_integration() -> void:
 	# Test our actual CreateNodeTool uses the new system correctly
-	var schema: Dictionary = MCPRoutes.format_tool_schema(CreateNodeTool)
+	var router: MCPRouter = MCPRouter.new([CreateNodeTool.new()])
+	var schema: Dictionary = router.format_tool_schema(CreateNodeTool.new())
 	
 	assert(schema.has("name"), "CreateNodeTool should have name")
 	assert(schema.has("description"), "CreateNodeTool should have description")
@@ -179,7 +189,8 @@ func test_create_node_tool_integration() -> void:
 	assert(properties["node_name"]["description"] == "Name for the new node", "node_name should have description")
 
 func test_tool_schema_matches_mcp_spec() -> void:
-	var schema: Dictionary = MCPRoutes.format_tool_schema(MockTool)
+	var router: MCPRouter = MCPRouter.new([MockTool.new()])
+	var schema: Dictionary = router.format_tool_schema(MockTool.new())
 	
 	# Verify it matches MCP specification structure
 	assert(schema is Dictionary, "Schema should be Dictionary")
