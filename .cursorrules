@@ -78,4 +78,22 @@ func parse_http_request(raw_data: String) -> Dictionary:
 - Favor composition over inheritance
 - Use dependency injection for better testability
 - Keep classes focused on a single responsibility
-- Separate concerns clearly between layers 
+- Separate concerns clearly between layers
+
+## Implementing New Tools
+- **ALWAYS read the README.md first** for comprehensive instructions on adding new tools
+- The README contains detailed guidance on:
+  - Tool architecture and base class patterns
+  - Schema validation with Zodot
+  - Registration process in plugin.gd
+  - Testing requirements and examples
+  - Code quality standards and examples
+- Follow the existing tool patterns exactly (see addons/godot_agent_mcp/mcp/tools/)
+- All tools must extend MCPTool and implement the four required methods:
+  - get_name() - Unique tool identifier
+  - get_description() - Human-readable description  
+  - get_input_schema() - Zodot schema for parameter validation
+  - run(params) - Tool execution logic
+- Use Zodot for robust parameter validation - never manually validate parameters
+- Register new tools in plugin.gd's tool array
+- Include comprehensive docblocks for all public methods 
