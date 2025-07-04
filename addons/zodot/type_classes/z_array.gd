@@ -8,10 +8,25 @@ func _init(schema = null):
 
 func _valid_type(value: Variant) -> bool:
 	return typeof(value) == TYPE_ARRAY
+
+func get_mcp_type() -> String:
+	return "array"
 	
 func non_empty() -> z_array:
 	_non_empty = true
 	return self
+
+func items(schema: Zodot) -> z_array:
+	_schema = schema
+	return self
+
+func to_mcp_property() -> Dictionary:
+	var property = super()
+	
+	if _schema != null:
+		property["items"] = _schema.to_mcp_property()
+	
+	return property
 
 func parse(value: Variant, field: Variant = "") -> ZodotResult:
 	if _coerce and typeof(value) == TYPE_STRING:

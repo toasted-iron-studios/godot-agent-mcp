@@ -19,6 +19,9 @@ func maximum(m: int) -> z_string:
 	_max = m
 	return self
 
+func get_mcp_type() -> String:
+	return "string"
+
 func parse(value: Variant, field: Variant = "") -> ZodotResult:
 	if _coerce and typeof(value) == TYPE_STRING:
 		value = str_to_var(value)

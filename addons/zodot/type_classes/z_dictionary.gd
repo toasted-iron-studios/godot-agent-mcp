@@ -8,6 +8,9 @@ func _init(schema = null):
 
 func _valid_type(value: Variant) -> bool:
 	return typeof(value) == TYPE_DICTIONARY
+
+func get_mcp_type() -> String:
+	return "object"
 	
 func non_empty() -> z_dictionary:
 	_non_empty = true

@@ -5,6 +5,9 @@ var _min
 	
 func _valid_type(value: Variant) -> bool:
 	return typeof(value) == TYPE_FLOAT
+
+func get_mcp_type() -> String:
+	return "number"
 	
 func minimum(m: float) -> z_float:
 	_min = m

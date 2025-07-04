@@ -19,4 +19,4 @@ gdscript/warnings/untyped_declaration=2
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_agent_mcp/plugin.cfg", "res://addons/zodot/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_agent_mcp/plugin.cfg")
