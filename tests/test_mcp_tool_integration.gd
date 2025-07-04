@@ -1,8 +1,6 @@
 extends RefCounted
 class_name TestMCPToolIntegration
 
-const MCPRouter = preload("res://addons/godot_agent_mcp/mcp_routes.gd")
-
 # Mock tool class for testing
 class MockTool extends MCPTool:
 	func get_name() -> String:

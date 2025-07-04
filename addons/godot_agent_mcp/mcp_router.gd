@@ -2,13 +2,20 @@
 extends RefCounted
 class_name MCPRouter
 
-const MCPError = preload("res://addons/godot_agent_mcp/mcp_error.gd")
-
 var _tools: Array[MCPTool] = []
 
+## Creates a new MCP router with the specified tools
+## Parameters:
+##   - tools: Array of MCPTool instances to register with this router
 func _init(tools: Array[MCPTool]):
 	_tools = tools
 
+## Handles incoming MCP requests and routes them to appropriate handlers
+## Parameters:
+##   - method: The MCP method name (e.g., "initialize", "tools/list", "tools/call")
+##   - params: Dictionary containing method parameters
+##   - id: Request ID for JSON-RPC response correlation
+## Returns: Dictionary containing JSON-RPC 2.0 formatted response
 func handle_request(method: String, params: Dictionary, id: Variant) -> Dictionary:
 	var result: Dictionary = {}
 	match method:
@@ -58,6 +65,20 @@ func handle_request(method: String, params: Dictionary, id: Variant) -> Dictiona
 		"result": result
 	}
 
+## Utility function to format a tool's schema for MCP
+## Parameters:
+##   - tool: MCPTool instance to generate schema for
+## Returns: Dictionary containing MCP-compatible tool schema
+func format_tool_schema(tool: MCPTool) -> Dictionary:
+	var input_schema = tool.get_input_schema()
+	return {
+		"name": tool.get_name(),
+		"description": tool.get_description(),
+		"inputSchema": input_schema.to_mcp_property()
+	}
+
+## Lists all available tools in MCP format
+## Returns: Dictionary containing array of tool schemas
 func _list_tools() -> Dictionary:
 	var tools_array = []
 	for tool in _tools:
@@ -66,22 +87,22 @@ func _list_tools() -> Dictionary:
 	return {
 		"tools": tools_array
 	}
-
-## Utility function to format a tool's schema for MCP
-func format_tool_schema(tool: MCPTool) -> Dictionary:
-	var input_schema = tool.get_input_schema()
-	return {
-		"name": tool.get_name(),
-		"description": tool.get_description(),
-		"inputSchema": input_schema.to_mcp_property()
-	}
 	
+## Finds a tool by name from the registered tools
+## Parameters:
+##   - tool_name: Name of the tool to find
+## Returns: MCPTool instance if found, null otherwise
 func _get_tool_by_name(tool_name: String) -> MCPTool:
 	for tool in _tools:
 		if tool.get_name() == tool_name:
 			return tool
 	return null
 
+## Executes a tool with the given arguments
+## Parameters:
+##   - tool_name: Name of the tool to execute
+##   - arguments: Dictionary of arguments to pass to the tool
+## Returns: Dictionary containing tool result or error information
 func _call_tool(tool_name: String, arguments: Dictionary) -> Dictionary:
 	var tool = _get_tool_by_name(tool_name)
 	if not tool:

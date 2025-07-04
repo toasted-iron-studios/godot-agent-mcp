@@ -1,0 +1,81 @@
+# Cursor Rules for Godot Agent MCP Project
+
+## Code Quality Standards
+
+### NO INLINE COMMENTS
+- NEVER use inline comments (single # comments within function bodies)
+- Inline comments indicate poor code quality and lack of experience
+- If code needs explanation, refactor it into a well-named function with a docblock
+- Code should be self-documenting through clear variable and function names
+
+### Commenting Standards
+- ONLY use docblock comments (## comments) for function/class documentation
+- Docblocks should describe WHAT the function does, not HOW it does it
+- Focus on the purpose, parameters, return values, and side effects
+- No redundant comments that just repeat what the code obviously does
+
+### MANDATORY DOCBLOCKS
+- ALL public functions MUST have descriptive docblocks
+- Docblocks must explain the function's purpose, parameters, return values, and side effects
+- Private functions (starting with _) should have docblocks if their purpose isn't immediately obvious
+- Include parameter types and return types in the description when helpful
+- Document any exceptions or error conditions the function might encounter
+
+### Code Structure
+- If logic is complex enough to "need" inline comments, extract it to a separate function
+- Use descriptive variable and function names that make the code self-explanatory
+- Prefer small, focused functions with clear responsibilities
+- Break down complex operations into well-named helper functions
+
+### Examples of BAD commenting:
+```gdscript
+# Parse the request data  <-- NEVER DO THIS
+var data = parse_request(request)
+
+# Check if user is valid  <-- NEVER DO THIS  
+if user.is_valid():
+    # Process the user  <-- NEVER DO THIS
+    process_user(user)
+```
+
+### Examples of GOOD commenting:
+```gdscript
+## Validates user credentials and processes authentication request
+## Returns true if authentication succeeds, false otherwise
+func authenticate_user(credentials: Dictionary) -> bool:
+    var user = find_user_by_credentials(credentials)
+    if not user or not user.is_valid():
+        return false
+    
+    return process_authentication(user)
+
+## Converts raw HTTP request data into a structured request object
+## Parameters:
+##   - raw_data: The complete HTTP request as a string
+## Returns: Dictionary containing parsed headers, body, and method
+## Throws: Returns error dictionary if request format is invalid
+func parse_http_request(raw_data: String) -> Dictionary:
+    # Implementation here
+```
+
+### Function Naming
+- Use descriptive verb phrases for functions: `validate_input()`, `parse_json_request()`, `handle_authentication()`
+- Use descriptive nouns for variables: `user_credentials`, `parsed_data`, `validation_result`
+- Avoid abbreviations and single-letter variables (except for short loop counters)
+
+### Refactoring Guidelines
+- If you find yourself wanting to add an inline comment, stop and refactor instead
+- Extract the code block into a function with a descriptive name
+- The function name should explain what the inline comment would have said
+
+## GDScript Specific Rules
+- Follow GDScript naming conventions (snake_case for variables/functions, PascalCase for classes)
+- Use type hints wherever possible
+- Prefer `match` statements over long `if/elif` chains
+- Use `const` for compile-time constants, `var` for variables
+
+## Architecture Guidelines
+- Favor composition over inheritance
+- Use dependency injection for better testability
+- Keep classes focused on a single responsibility
+- Separate concerns clearly between layers 
