@@ -52,7 +52,7 @@ class MCPToolError extends MCPError:
 			"content": [
 				{
 					"type": "text",
-					"text": get_message()
+					"text": "Error: " + get_message()
 				}
 			],
 			"isError": true

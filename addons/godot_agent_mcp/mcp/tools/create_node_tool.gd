@@ -28,7 +28,7 @@ func run(params: Dictionary) -> Dictionary:
 	var node_type: String = params.get("node_type", "")
 	var node_name: String = params.get("node_name", "")
 
-	var scene_root = get_scene_root()
+	var scene_root = EditorInterface.get_edited_scene_root()
 	if not scene_root:
 		return err("No scene is currently open in the Godot editor. Please create or open a scene first.")
 	
@@ -53,10 +53,4 @@ func run(params: Dictionary) -> Dictionary:
 	
 	var full_path: String = new_node.get_path()
 	
-	return ok({
-		"success": true,
-		"node_path": str(full_path),
-		"node_type": node_type,
-		"node_name": node_name,
-		"parent_path": parent_path
-	})
+	return ok("Node %s created at path: %s" % [node_name, full_path])

@@ -2,8 +2,8 @@
 extends EditorPlugin
 
 const HttpServer = preload("res://addons/godot_agent_mcp/http_server.gd")
-const MCPRouter = preload("res://addons/godot_agent_mcp/mcp_router.gd")
-const CreateNodeTool = preload("res://addons/godot_agent_mcp/tools/create_node_tool.gd")
+const MCPRouter = preload("res://addons/godot_agent_mcp/mcp/mcp_router.gd")
+const CreateNodeTool = preload("res://addons/godot_agent_mcp/mcp/tools/create_node_tool.gd")
 
 var http_server: HttpServer
 

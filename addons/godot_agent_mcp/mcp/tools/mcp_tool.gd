@@ -30,44 +30,25 @@ func get_input_schema() -> z_schema:
 ## Must be implemented by subclasses
 func run(params: Dictionary) -> Dictionary:
 	push_error("MCPTool.run() must be implemented by subclass")
-	return {"error": "Tool not implemented"}
+	return err("Tool not implemented")
 
 ## Utility function for common error responses
 ## Parameters:
 ##   - message: Error message to return
 ## Returns: Dictionary formatted as an error response
 func err(message: String) -> Dictionary:
-	return {"error": message}
+	return {"error": MCPError.MCPToolError.new(message)}
 
 ## Utility function for success responses
 ## Parameters:
 ##   - data: Success data to return
 ## Returns: Dictionary formatted as a success response
-func ok(data: Dictionary) -> Dictionary:
-	return {"result": data}
-
-## Get the GodotAgentMCPPlugin instance
-## Returns: Plugin instance or null if not found
-func _get_plugin() -> Variant:
-	var plugin = Engine.get_meta("GodotAgentMCPPlugin")
-	if not plugin:
-		push_error("GodotAgentMCPPlugin not found in Engine metadata")
-		return null
-	return plugin
-
-## Get the editor interface from the plugin
-## Returns: EditorInterface instance or null if not available
-func get_editor_interface() -> EditorInterface:
-	var plugin = _get_plugin()
-	if not plugin:
-		return null
-	return plugin.get_editor_interface()
-
-## Get the currently edited scene root
-## Returns: Root node of the currently edited scene or null if none open
-func get_scene_root() -> Node:
-	var editor_interface = get_editor_interface()
-	if not editor_interface:
-		return null
-	
-	return editor_interface.get_edited_scene_root()
+func ok(text: String) -> Dictionary:
+	return {
+		"content": [
+			{
+				"type": "text",
+				"text": text
+			}
+		]
+	}
