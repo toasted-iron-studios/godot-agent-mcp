@@ -54,30 +54,8 @@ Notably, the MCP runs _in_ Godot, which reduces installation complexity and impr
 Configure your AI assistant to use the MCP server:
 
 **For Cursor/VSCode:**
-```json
-{
-  "mcp": {
-    "servers": {
-      "godot-agent": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-fetch", "http://127.0.0.1:8080"]
-      }
-    }
-  }
-}
-```
 
-**For Claude Desktop:**
-```json
-{
-  "mcpServers": {
-    "godot-agent": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch", "http://127.0.0.1:8080"]
-    }
-  }
-}
-```
+Copy-pasta the sample MCP config in the repo: mcp.json.sample
 
 ### Available Tools
 
