@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "godot-agent-mcp": {
+     "transport": "http",
+      "url": "http://localhost:8080"
+    }
+  }
+}

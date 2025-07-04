@@ -17,7 +17,7 @@ class MockTool extends MCPTool:
 		})
 	
 	func run(_params: Dictionary) -> Dictionary:
-		return ok({"message": "Mock tool executed"})
+		return ok("Mock tool executed")
 
 func test_mcp_tool_get_schema_structure() -> void:
 	var router: MCPRouter = MCPRouter.new([MockTool.new()])
@@ -88,7 +88,7 @@ class NestedMockTool extends MCPTool:
 		})
 	
 	func run(_params: Dictionary) -> Dictionary:
-		return ok({"message": "Nested tool executed"})
+		return ok("Nested tool executed")
 
 func test_nested_tool_schema_conversion() -> void:
 	var router: MCPRouter = MCPRouter.new([NestedMockTool.new()])
@@ -146,7 +146,7 @@ class ArrayMockTool extends MCPTool:
 		})
 	
 	func run(_params: Dictionary) -> Dictionary:
-		return ok({"message": "Array tool executed"})
+		return ok("Array tool executed")
 
 func test_array_tool_schema_conversion() -> void:
 	var router: MCPRouter = MCPRouter.new([ArrayMockTool.new()])
