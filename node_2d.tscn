@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://djmxmcued7pdx"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="MainMenu" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = "res://main_menu_controller.gd"
+
+[node name="MenuPadding" type="MarginContainer" parent="MainMenu"]
+layout_mode = 0
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 100
+
+[node name="MainMenuLayout" type="VBoxContainer" parent="MainMenu/MenuPadding"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainMenu/MenuPadding/MainMenuLayout"]
+layout_mode = 2
+text = "My Amazing Game"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="MainMenu/MenuPadding/MainMenuLayout"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ButtonContainer" type="VBoxContainer" parent="MainMenu/MenuPadding/MainMenuLayout"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="NewGameButton" type="Button" parent="MainMenu/MenuPadding/MainMenuLayout/ButtonContainer"]
+layout_mode = 2
+text = "New Game"
+script = "res://menu_button.gd"
+
+[node name="LoadGameButton" type="Button" parent="MainMenu/MenuPadding/MainMenuLayout/ButtonContainer"]
+layout_mode = 2
+text = "Load Game"
+script = "res://menu_button.gd"
+
+[node name="SettingsButton" type="Button" parent="MainMenu/MenuPadding/MainMenuLayout/ButtonContainer"]
+layout_mode = 2
+text = "Settings"
+script = "res://menu_button.gd"
+
+[node name="CreditsButton" type="Button" parent="MainMenu/MenuPadding/MainMenuLayout/ButtonContainer"]
+layout_mode = 2
+text = "Credits"
+script = "res://menu_button.gd"
+
+[node name="ExitButton" type="Button" parent="MainMenu/MenuPadding/MainMenuLayout/ButtonContainer"]
+layout_mode = 2
+text = "Exit"
+script = "res://menu_button.gd"
