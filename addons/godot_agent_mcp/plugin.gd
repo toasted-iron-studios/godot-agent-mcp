@@ -8,6 +8,7 @@ const ListNodesTool = preload("res://addons/godot_agent_mcp/mcp/tools/list_nodes
 const DeleteNodeTool = preload("res://addons/godot_agent_mcp/mcp/tools/delete_node_tool.gd")
 const UpdateNodePropertyTool = preload("res://addons/godot_agent_mcp/mcp/tools/update_node_property_tool.gd")
 const GetNodePropertiesTool = preload("res://addons/godot_agent_mcp/mcp/tools/get_node_properties_tool.gd")
+const CreateResourceTool = preload("res://addons/godot_agent_mcp/mcp/tools/create_resource_tool.gd")
 
 var http_server: HttpServer
 
@@ -21,7 +22,8 @@ func _enter_tree():
 		ListNodesTool.new(),
 		DeleteNodeTool.new(),
 		UpdateNodePropertyTool.new(),
-		GetNodePropertiesTool.new()
+		GetNodePropertiesTool.new(),
+		CreateResourceTool.new()
 	]), 8080)
 
 	print("Godot Agent MCP plugin started")
